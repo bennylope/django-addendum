@@ -4,7 +4,7 @@ from .models import Snippet
 
 
 class SnippetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'text')
+    list_display = ('key', 'text')
 
 
 admin.site.register(Snippet, SnippetAdmin)

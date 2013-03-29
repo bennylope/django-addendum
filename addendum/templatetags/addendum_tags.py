@@ -44,7 +44,7 @@ class SnippetNode(template.Node):
     def render(self, context):
         key = self.key
         try:
-            snippet = Snippet.objects.get_from_cache(id=key)
+            snippet = Snippet.objects.get_from_cache(key=key)
         except Snippet.DoesNotExist:
             output = self.nodelist.render(context)
             return output

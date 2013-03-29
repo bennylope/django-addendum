@@ -10,9 +10,9 @@ class TagTests(TestCase):
     """
 
     def setUp(self):
-        self.plain_snippet = Snippet.objects.create(id="plain",
+        self.plain_snippet = Snippet.objects.create(key="plain",
                 text="Hello, humans")
-        self.rich_snippet = Snippet.objects.create(id="rich",
+        self.rich_snippet = Snippet.objects.create(key="rich",
                 text="<h1>Hello, humans</h1>")
 
     def test_has_snippet(self):
