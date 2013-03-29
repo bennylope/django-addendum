@@ -34,10 +34,10 @@ Just add `addendum_tags` to your templates:
 
     {% load addendum_tags %}
 
-    {% editable 'home:greeting' %}Hi!{% endeditable %} {{ user.first_name }}
+    {% snippet 'home:greeting' %}Hi!{% endsnippet %} {{ user.first_name }}
 
     <footer>
-      {% editable 'home:footer' %}&copy; 2011 by Acme Corp.{% endeditable %}
+      {% snippet 'home:footer' %}&copy; 2011 by Acme Corp.{% endsnippet %}
     </footer>
 
 Now you can edit content for these placeholders from the admin interface. If
