@@ -2,9 +2,9 @@
 Django Addendum
 ===============
 
-.. image:: https://api.travis-ci.org/bennylope/django-addendum.png?branch=master
+.. image:: https://api.travis-ci.org/wellfire/django-addendum.png?branch=master
     :alt: Build Status
-    :target: http://travis-ci.org/bennylope/django-addendum
+    :target: http://travis-ci.org/wellfire/django-addendum
 
 Change snippets of copy on your site, on the fly, for any application, and
 without a full-fledged CMS.
