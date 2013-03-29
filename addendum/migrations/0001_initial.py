@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Snippet'
         db.create_table(u'addendum_snippet', (
-            ('id', self.gf('django.db.models.fields.CharField')(max_length=100, primary_key=True)),
+            ('key', self.gf('django.db.models.fields.CharField')(max_length=100, primary_key=True)),
             ('text', self.gf('django.db.models.fields.TextField')()),
         ))
         db.send_create_signal(u'addendum', ['Snippet'])
@@ -23,8 +23,8 @@ class Migration(SchemaMigration):
 
     models = {
         u'addendum.snippet': {
-            'Meta': {'ordering': "('id',)", 'object_name': 'Snippet'},
-            'id': ('django.db.models.fields.CharField', [], {'max_length': '100', 'primary_key': 'True'}),
+            'Meta': {'ordering': "('key',)", 'object_name': 'Snippet'},
+            'key': ('django.db.models.fields.CharField', [], {'max_length': '100', 'primary_key': 'True'}),
             'text': ('django.db.models.fields.TextField', [], {})
         }
     }
