@@ -12,6 +12,14 @@ register = template.Library()
 @register.tag
 def snippet(parser, token):
     """
+    Demarcates replaceable text, outputs the wrapped text or the text of a
+    snippet with matching key.
+
+    Examples::
+
+        {% snippet 'greeting' %}Hello world{% endsnippet %}
+
+        {% snippet 'greeting' richtext=True %}<p>Hey!</p>{% endsnippet %}
     """
     nodelist = parser.parse(('endsnippet',))
     parser.delete_first_token()
@@ -43,9 +51,8 @@ class SnippetNode(template.Node):
 
     def render(self, context):
         key = self.key
-        try:
-            snippet = Snippet.objects.get_from_cache(key=key)
-        except Snippet.DoesNotExist:
+        snippet = Snippet.objects.get_from_cache(key=key)
+        if snippet is None:
             output = self.nodelist.render(context)
             return output
 

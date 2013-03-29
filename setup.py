@@ -8,12 +8,12 @@ with open('README.rst') as f:
 
 setup(
     name='django-addendum',
-    version='0.0.2',
+    version='0.0.3',
     description='Simple template-based content swapping for CMS-less sites',
     long_description=readme,
     author='Ben Lopatin',
     author_email='ben.lopatin@wellfireinteractive.com',
-    url='https://github.com/bennylope/django-addendum',
+    url='https://github.com/wellfire/django-addendum',
     license='BSD License',
     packages=find_packages(exclude=('example', 'docs')),
     platforms=['OS Independent'],

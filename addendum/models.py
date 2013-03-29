@@ -8,19 +8,35 @@ class CachedManager(models.Manager):
 
     def get_from_cache(self, key):
         """
-        Fetches the snippet from cache, and if for some reason it's missing,
-        add it to the cache after retrieval.
+        Fetches the snippet from cache.
+
+        Returns a `Snippet` object or `None`.
+
+        This method addes every queried key to the cache to ensure that misses
+        doesn't continue to generate database lookups. Since `None` is the
+        default return value for a cache miss, the method uses -1 as the miss
+        value. If this is returned we know that the value should not be present
+        in the database, either.
         """
         snippet = cache.get('snippet:{0}'.format(key))
-        if not snippet:
-            snippet = Snippet.objects.get(key=key)
-            cache.set('snippet:{0}'.format(key), snippet)
+
+        if snippet == -1:
+            return None
+
+        if snippet is None:
+            try:
+                snippet = Snippet.objects.get(key=key)
+            except Snippet.DoesNotExist:
+                cache.set('snippet:{0}'.format(key), -1)
+            else:
+                cache.set('snippet:{0}'.format(key), snippet)
+
         return snippet
 
 
 class Snippet(models.Model):
     """
-    Model for storing snippets of text for replacement in templates
+    Model for storing snippets of text for replacement in templates.
     """
     key = models.CharField(max_length=100, primary_key=True)
     text = models.TextField()
