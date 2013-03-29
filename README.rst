@@ -47,7 +47,7 @@ what is in the template.
 Use it for small bits of user modifiable text from any template on your site,
 and for swapping out *lorem ipsum* text when prototyping.
 
-Find some more [information in the docs](https://django-addendum.readthedocs.org/en/latest/).
+Find some more `information in the docs <https://django-addendum.readthedocs.org/en/latest/>`_.
 
 Installation
 ============
