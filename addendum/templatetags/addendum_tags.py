@@ -1,5 +1,5 @@
 from django import template
-from django.template.base import TemplateSyntaxError, kwarg_re
+from django.template.base import TemplateSyntaxError
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
@@ -23,31 +23,40 @@ def snippet(parser, token):
     """
     nodelist = parser.parse(('endsnippet',))
     parser.delete_first_token()
+    options = {}
 
     try:
         # split_contents() knows not to split quoted strings.
-        tag_name, key, rich = token.split_contents()
+        tag_name, key, option_kwargs = token.split_contents()
         try:
-            richkey, richval = rich.split('=')
+            option, val = option_kwargs.split('=')
         except ValueError:
-            raise TemplateSyntaxError("Bad or badly formed richtext kwargs")
+            raise TemplateSyntaxError("Bad or badly formed option arguments.")
         else:
-            if richkey != 'richtext':
-                raise TemplateSyntaxError("Bad or badly formed richtext kwargs")
-            richtext = True if richval == 'True' else False
+            if option not in ['richtext', 'template']:
+                raise TemplateSyntaxError("Invalid option; only 'richtext' and 'template' can be used.")
+            if val == "True":
+                options.update({option: True})
+            elif val == "False":
+                options.update({option: False})
+            else:
+                raise TemplateSyntaxError("Invalid option value; you must specify a Boolean value.")
 
     except ValueError:
         tag_name, key = token.split_contents()
-        richtext = False
-    return SnippetNode(nodelist, key[1:-1], richtext)
+    return SnippetNode(nodelist, key[1:-1], **options)
 
 
 class SnippetNode(template.Node):
 
-    def __init__(self, nodelist, key, richtext=False):
+    richtext = False
+    template = False
+
+    def __init__(self, nodelist, key, **options):
         self.nodelist = nodelist
         self.key = key
-        self.richtext = richtext
+        for k, v in options.items():
+            setattr(self, k, v)
 
     def render(self, context):
         key = self.key
@@ -56,6 +65,10 @@ class SnippetNode(template.Node):
             output = self.nodelist.render(context)
             return output
 
+        if self.template:
+            return template.Template(snippet.text).render(context)
+
         if self.richtext:
             return mark_safe(snippet.text)
+
         return conditional_escape(snippet.text)

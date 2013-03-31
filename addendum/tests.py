@@ -14,6 +14,8 @@ class TagTests(TestCase):
                 text="Hello, humans")
         self.rich_snippet = Snippet.objects.create(key="rich",
                 text="<h1>Hello, humans</h1>")
+        self.template_snippet = Snippet.objects.create(key="django",
+                text="{{ dog|upper }}")
 
     def test_has_snippet(self):
         """Ensure that the saved snippet text is displayed"""
@@ -42,3 +44,17 @@ class TagTests(TestCase):
         c = Context({})
         result = t.render(c)
         self.assertEqual(result, "<h1>Hello, humans</h1>")
+
+    def test_raw_template_text(self):
+        """Ensure template code is not compiled by default"""
+        t = Template("""{% spaceless %}{% load addendum_tags %}{% snippet 'django' %}Hello world{% endsnippet %}{% endspaceless %}""")
+        c = Context({'dog': 'woof'})
+        result = t.render(c)
+        self.assertEqual(result, "{{ dog|upper }}")
+
+    def test_template_text(self):
+        """Ensure template code is rendered with the template option"""
+        t = Template("""{% spaceless %}{% load addendum_tags %}{% snippet 'django' template=True %}Hello world{% endsnippet %}{% endspaceless %}""")
+        c = Context({'dog': 'woof'})
+        result = t.render(c)
+        self.assertEqual(result, "WOOF")
