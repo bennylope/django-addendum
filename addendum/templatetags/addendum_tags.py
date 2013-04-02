@@ -26,30 +26,38 @@ def snippet(parser, token):
     options = {}
 
     try:
-        # split_contents() knows not to split quoted strings.
-        tag_name, key, option_kwargs = token.split_contents()
-        try:
-            option, val = option_kwargs.split('=')
-        except ValueError:
-            raise TemplateSyntaxError("Bad or badly formed option arguments.")
-        else:
-            if option not in ['richtext', 'template']:
-                raise TemplateSyntaxError("Invalid option; only 'richtext' and 'template' can be used.")
-            if val == "True":
-                options.update({option: True})
-            elif val == "False":
-                options.update({option: False})
-            else:
-                raise TemplateSyntaxError("Invalid option value; you must specify a Boolean value.")
+        tag_name = token.split_contents()
+        bits = token.split_contents()[1:]
+    except IndexError:
+        raise TemplateSyntaxError("%s tag takes at least one argument" % bits[0])
 
-    except ValueError:
-        tag_name, key = token.split_contents()
+    key = bits[0]
+
+    for bit in bits[1:]:
+        try:
+            option, val = bit.split('=')
+        except ValueError:
+            raise TemplateSyntaxError("%s has bad or badly formed option arguments." % tag_name)
+
+        if option not in ['safe', 'richtext', 'template']:
+            raise TemplateSyntaxError("%s recieved an invalid option." % tag_name)
+
+        if option == 'richtext':
+            option = 'safe'
+
+        if val == "True":
+            options.update({option: True})
+        elif val == "False":
+            options.update({option: False})
+        else:
+            raise TemplateSyntaxError("%s received an invalid option value." % tag_name)
+
     return SnippetNode(nodelist, key[1:-1], **options)
 
 
 class SnippetNode(template.Node):
 
-    richtext = False
+    safe = False
     template = False
 
     def __init__(self, nodelist, key, **options):
@@ -66,9 +74,12 @@ class SnippetNode(template.Node):
             return output
 
         if self.template:
+            if self.safe:
+                context.autoescape = False
+                return mark_safe(template.Template(snippet.text).render(context))
             return template.Template(snippet.text).render(context)
 
-        if self.richtext:
+        if self.safe:
             return mark_safe(snippet.text)
 
         return conditional_escape(snippet.text)

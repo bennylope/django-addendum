@@ -58,3 +58,14 @@ class TagTests(TestCase):
         c = Context({'dog': 'woof'})
         result = t.render(c)
         self.assertEqual(result, "WOOF")
+
+    def test_safe_template_text(self):
+        t = Template("""{% spaceless %}{% load addendum_tags %}{% snippet 'django' template=True %}Hello world{% endsnippet %}{% endspaceless %}""")
+        c = Context({'dog': '<h1>woof</h1>'})
+        result = t.render(c)
+        self.assertEqual(result, "&lt;H1&gt;WOOF&lt;/H1&gt;")
+
+        t = Template("""{% spaceless %}{% load addendum_tags %}{% snippet 'django' template=True safe=True %}Hello world{% endsnippet %}{% endspaceless %}""")
+        c = Context({'dog': '<h1>woof</h1>'})
+        result = t.render(c)
+        self.assertEqual(result, "<H1>WOOF</H1>")
