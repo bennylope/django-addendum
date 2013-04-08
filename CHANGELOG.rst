@@ -1,6 +1,13 @@
 Changes
 =======
 
+0.1.0
+-----
+
+* Updated docs
+* Explicitly allow template variable names to be passed as snippet key
+  arguments.
+
 0.0.5
 -----
 

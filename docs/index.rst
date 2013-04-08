@@ -38,17 +38,24 @@ Sync your database or migrate if you have `South
 Basic Usage
 ===========
 
-Just add `addendum_tags` to your templates:
+Just add `addendum_tags` to your templates and reference a snippet by name.
 
 ::
 
     {% load addendum_tags %}
 
-    {% editable 'home:greeting' %}Hi!{% endeditable %} {{ user.first_name }}
+    {% snippet 'home:greeting' %}Hi!{% endsnippet %} {{ user.first_name }}
 
     <footer>
-      {% editable 'home:footer' %}&copy; 2011 by Acme Corp.{% endeditable %}
+      {% snippet 'home:footer' %}&copy; 2011 by Acme Corp.{% endsnippet %}
     </footer>
+
+You can use template variables for snippet names, too.
+
+::
+
+    {% snippet greeting %}Hi!{% endsnippet %} {{ user.first_name }}
+
 
 Now you can edit content for these placeholders from the admin interface. If
 you don't add anything or you delete text, the site text will always revert to
@@ -61,14 +68,19 @@ Richtext snippets
 =================
 
 Text from snippets is escaped by default. If you want to render non-escaped
-HTML, use the `richtext` keyword argument::
+HTML, use the `safe` keyword argument::
 
     {% load addendum_tags %}
 
-    {% snippet 'greeting' richtext=True %}Bienvenidos!{% endsnippet %}
+    {% snippet 'greeting' safe=True %}Bienvenidos!{% endsnippet %}
 
 Plaintext by default is a good way of keeping site editors from getting carried
 away by adding differently formatted content.
+
+.. note::
+
+    Previous versions used the `richtext` keyword. This will work as well, but
+    is deprecated.
 
 Caching
 =======
