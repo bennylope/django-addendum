@@ -69,3 +69,10 @@ class TagTests(TestCase):
         c = Context({'dog': '<h1>woof</h1>'})
         result = t.render(c)
         self.assertEqual(result, "<H1>WOOF</H1>")
+
+    def test_variable_key_name(self):
+        """Ensure a variable can be passed for the snippet key"""
+        t = Template("""{% spaceless %}{% load addendum_tags %}{% snippet snippetname %}Hello world{% endsnippet %}{% endspaceless %}""")
+        c = Context({'snippetname': 'plain'})
+        result = t.render(c)
+        self.assertEqual(result, "Hello, humans")

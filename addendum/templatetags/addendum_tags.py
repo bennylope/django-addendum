@@ -52,7 +52,7 @@ def snippet(parser, token):
         else:
             raise TemplateSyntaxError("%s received an invalid option value." % tag_name)
 
-    return SnippetNode(nodelist, key[1:-1], **options)
+    return SnippetNode(nodelist, key, **options)
 
 
 class SnippetNode(template.Node):
@@ -62,12 +62,15 @@ class SnippetNode(template.Node):
 
     def __init__(self, nodelist, key, **options):
         self.nodelist = nodelist
-        self.key = key
+        self.key = template.Variable(key)
         for k, v in options.items():
             setattr(self, k, v)
 
     def render(self, context):
-        key = self.key
+        try:
+            key = self.key.resolve(context)
+        except AttributeError:
+            key = self.key[1:-1]
         snippet = Snippet.objects.get_from_cache(key=key)
         if snippet is None:
             output = self.nodelist.render(context)
