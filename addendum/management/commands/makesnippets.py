@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 key=snip['name'],
                 defaults={'text': snip['content']}
             )
-            print("Snippet found: {}".format(snip.key))
+            self.stdout.write("Snippet found: {0}".format(snip.key))
 
     def handle(self, *args, **options):
         self.search_files()
