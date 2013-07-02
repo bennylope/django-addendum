@@ -98,6 +98,22 @@ the base text in the template is rendered directly.
 Signal recievers for both the `post_save` and `post_delete` signals ensure that
 keys are properly updated.
 
+Makesnippets command
+====================
+Once addendum is installed there will be a new manage.py command available called
+`makesnippets`. This command searches inside every available template in your
+django project for `snippet` tags and run `Snippet.objects.get_or_create` for each
+snippet found. ::
+
+    > ./manage.py makesnippets
+    Snippet found: link_facebook
+    Snippet found: link_twitter
+    Snippet found: footer
+    Snippet found: home
+    Snippet found: info
+    Snippet found: contact
+    Snippet found: content
+
 License
 =======
 
@@ -109,4 +125,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
-
