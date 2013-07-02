@@ -63,6 +63,22 @@ Add it to your `INSTALLED_APPS` tuple::
 Sync your database or migrate if you have `South
 <south.readthedocs.org/en/latest/>`_ installed.
 
+Contributing
+============
+
+Contributions are welcome but should follow some basic guidelines to make life
+easier:
+
+* Pull requests should be made from distinct branches that include only the
+  reuqested changes branched from the canonical master branch.
+* Include tests for bug fixes and new features. Ensure that your Travis build
+  is passing before submitting the pull request.
+* Include documentation for any new features.
+* For multi-commit updates please squash commits so the packager maintainer
+  only has at most a few commits to review.
+* Please limit changes to your specific pull request (excluding extraneous
+  changes and please do not bump the version for your own changes).
+
 License
 =======
 
