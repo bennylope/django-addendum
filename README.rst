@@ -6,6 +6,14 @@ Django Addendum
     :alt: Build Status
     :target: http://travis-ci.org/wellfire/django-addendum
 
+.. image:: https://pypip.in/v/django-addendum/badge.png
+    :alt: Current PyPI release
+    :target: https://crate.io/packages/django-addendum
+
+.. image:: https://pypip.in/d/django-addendum/badge.png
+    :alt: Download count
+    :target: https://crate.io/packages/django-addendum
+
 Change snippets of copy on your site, on the fly, for any application, and
 without a full-fledged CMS.
 
