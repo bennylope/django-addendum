@@ -26,8 +26,5 @@ setup(
         'Programming Language :: Python',
         'Framework :: Django',
     ],
-    install_requires=[
-        'Django>=1.4',
-    ],
     include_package_data=True,
 )

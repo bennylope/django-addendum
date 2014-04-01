@@ -1,25 +1,14 @@
 language: python
-python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
+python: 2.7
 env:
-  - DJANGO_INSTALL="Django==1.3.7"
-  - DJANGO_INSTALL="Django==1.4.5"
-  - DJANGO_INSTALL="Django==1.5.1"
-  - DJANGO_INSTALL="-e git+https://github.com/django/django.git@stable/1.6.x#egg=Django"
+  - TOX_ENV=flake8
+  - TOX_ENV=py26-django14
+  - TOX_ENV=py27-django14
+  - TOX_ENV=py27-django15
+  - TOX_ENV=py27-django16
+  - TOX_ENV=py33-django15
+  - TOX_ENV=py33-django16
 install:
-  - pip install -q $DJANGO_INSTALL
-  - pip install -r requirements.txt
-  - python setup.py -q install
-script: cd example && python manage.py test addendum
-matrix:
-  exclude:
-    - python: "3.3"
-      env: DJANGO_INSTALL="Django==1.3.7"
-    - python: "3.3"
-      env: DJANGO_INSTALL="Django==1.4.5"
-    - python: "2.6"
-      env: DJANGO_INSTALL="Django==1.5.1"
-    - python: "2.6"
-      env: DJANGO_INSTALL="-e git+https://github.com/django/django.git@stable/1.6.x#egg=Django"
+  - pip install tox
+script:
+  - tox -e $TOX_ENV

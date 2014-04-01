@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.template import Context, Template
 
-from .models import Snippet
+from addendum.models import Snippet
 
 
 class TagTests(TestCase):
