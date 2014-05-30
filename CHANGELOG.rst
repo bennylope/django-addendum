@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.2.0
+-----
+
+* Length key from 100 chars to 250
+* Test against Django 1.7
+
 0.1.0
 -----
 

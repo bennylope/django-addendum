@@ -1,6 +1,7 @@
 import sys
 
 try:
+    import django
     from django.conf import settings
 
     settings.configure(
@@ -22,6 +23,8 @@ try:
         NOSE_ARGS=['-s'],
         FIXTURE_DIRS=['tests/fixtures']
     )
+    if hasattr(django, 'setup'):
+        django.setup()
 
     from django_nose import NoseTestSuiteRunner
 except ImportError:
