@@ -38,7 +38,7 @@ class Snippet(models.Model):
     """
     Model for storing snippets of text for replacement in templates.
     """
-    key = models.CharField(max_length=100, primary_key=True)
+    key = models.CharField(max_length=250, primary_key=True)
     text = models.TextField()
     objects = CachedManager()
 
