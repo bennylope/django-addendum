@@ -2,6 +2,7 @@
 
 import os
 import sys
+import addendum
 
 from setuptools import setup, find_packages
 
@@ -15,15 +16,10 @@ if sys.argv[-1] == 'publish':
 with open('README.rst') as f:
     readme = f.read()
 
-with open("addendum/__init__.py", "r") as module_file:
-    for line in module_file:
-        if line.startswith("__version__"):
-            version_string = line.split("=")[1]
-            version = version_string.strip().replace("'", "")
 
 setup(
     name='django-addendum',
-    version=version,
+    version=addendum.__version__,
     description='Simple template-based content swapping for CMS-less sites',
     long_description=readme,
     author='Ben Lopatin',

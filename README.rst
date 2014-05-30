@@ -68,8 +68,7 @@ Add it to your `INSTALLED_APPS` tuple::
 
     INSTALLED_APPS += ('addendum')
 
-Sync your database or migrate if you have `South
-<south.readthedocs.org/en/latest/>`_ installed.
+Sync your database or migrate if you have `South <south.readthedocs.org/en/latest/>`_ installed.
 
 Contributing
 ============
