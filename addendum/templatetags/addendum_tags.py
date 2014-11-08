@@ -3,10 +3,46 @@ from django.template.base import TemplateSyntaxError
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from ..models import Snippet
+from ..models import get_cached_text
 
 
 register = template.Library()
+
+
+def str_bool(val):
+    if val.lower() == "true":
+        return True
+    elif val.lower() == "false":
+        return False
+    raise ValueError("{0} is not a string representation of a boolean".format(val))
+
+
+def build_options(bits, tag_name):
+    """
+    Splits the tag keyword arguments into usable values.
+    """
+
+    options = {}
+
+    for bit in bits:
+        try:
+            option, val = bit.split('=')
+        except ValueError:
+            raise TemplateSyntaxError("%s has bad or badly formed option arguments." % tag_name)
+
+        if option not in ['safe', 'richtext', 'template', 'language']:
+            raise TemplateSyntaxError("%s recieved an invalid option." % tag_name)
+
+        # Backwards compatibility
+        if option == 'richtext':
+            option = 'safe'
+
+        if option == 'language':
+            options.update({option: val})
+        else:
+            options.update({option: str_bool(val)})
+
+    return options
 
 
 @register.tag
@@ -23,7 +59,6 @@ def snippet(parser, token):
     """
     nodelist = parser.parse(('endsnippet',))
     parser.delete_first_token()
-    options = {}
 
     try:
         tag_name = token.split_contents()
@@ -32,25 +67,7 @@ def snippet(parser, token):
         raise TemplateSyntaxError("%s tag takes at least one argument" % bits[0])
 
     key = bits[0]
-
-    for bit in bits[1:]:
-        try:
-            option, val = bit.split('=')
-        except ValueError:
-            raise TemplateSyntaxError("%s has bad or badly formed option arguments." % tag_name)
-
-        if option not in ['safe', 'richtext', 'template']:
-            raise TemplateSyntaxError("%s recieved an invalid option." % tag_name)
-
-        if option == 'richtext':
-            option = 'safe'
-
-        if val == "True":
-            options.update({option: True})
-        elif val == "False":
-            options.update({option: False})
-        else:
-            raise TemplateSyntaxError("%s received an invalid option value." % tag_name)
+    options = build_options(bits[1:], tag_name)
 
     return SnippetNode(nodelist, key, **options)
 
@@ -59,6 +76,7 @@ class SnippetNode(template.Node):
 
     safe = False
     template = False
+    language = None
 
     def __init__(self, nodelist, key, **options):
         self.nodelist = nodelist
@@ -67,11 +85,23 @@ class SnippetNode(template.Node):
             setattr(self, k, v)
 
     def render(self, context):
+
+        # Handle key as context variable or key as string
         try:
             key = self.key.resolve(context)
         except AttributeError:
             key = self.key[1:-1]
-        snippet = Snippet.objects.get_from_cache(key=key)
+
+        if self.language is not None:
+            try:
+                language = self.language.resolve(context)
+            except AttributeError:
+                language = self.language[1:-1]
+        else:
+            language = self.language
+
+        snippet = get_cached_text(key, language)
+
         if snippet is None:
             output = self.nodelist.render(context)
             return output
@@ -79,10 +109,10 @@ class SnippetNode(template.Node):
         if self.template:
             if self.safe:
                 context.autoescape = False
-                return mark_safe(template.Template(snippet.text).render(context))
-            return template.Template(snippet.text).render(context)
+                return mark_safe(template.Template(snippet).render(context))
+            return template.Template(snippet).render(context)
 
         if self.safe:
-            return mark_safe(snippet.text)
+            return mark_safe(snippet)
 
-        return conditional_escape(snippet.text)
+        return conditional_escape(snippet)

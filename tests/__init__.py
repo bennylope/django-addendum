@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.template import Context, Template
 
-from addendum.models import Snippet
+from addendum.models import Snippet, SnippetTranslation
 
 
 class TagTests(TestCase):
@@ -16,6 +16,16 @@ class TagTests(TestCase):
                 text="<h1>Hello, humans</h1>")
         self.template_snippet = Snippet.objects.create(key="django",
                 text="{{ dog|upper }}")
+        SnippetTranslation.objects.create(
+            snippet=self.plain_snippet,
+            language='es',
+            text="Hola, humanos",
+        )
+        SnippetTranslation.objects.create(
+            snippet=self.plain_snippet,
+            language='en-au',
+            text="G'day, humans",
+        )
 
     def test_has_snippet(self):
         """Ensure that the saved snippet text is displayed"""
@@ -74,5 +84,19 @@ class TagTests(TestCase):
         """Ensure a variable can be passed for the snippet key"""
         t = Template("""{% spaceless %}{% load addendum_tags %}{% snippet snippetname %}Hello world{% endsnippet %}{% endspaceless %}""")
         c = Context({'snippetname': 'plain'})
+        result = t.render(c)
+        self.assertEqual(result, "Hello, humans")
+
+    def test_translate_basic(self):
+        """Translate based on passed language code"""
+        t = Template("""{% spaceless %}{% load addendum_tags %}{% snippet 'plain' language='es' %}Hello world{% endsnippet %}{% endspaceless %}""")
+        c = Context({})
+        result = t.render(c)
+        self.assertEqual(result, "Hola, humanos")
+
+    def test_missing_translation(self):
+        """Return default language for missing translation"""
+        t = Template("""{% spaceless %}{% load addendum_tags %}{% snippet 'plain' language='es-mx' %}Hello world{% endsnippet %}{% endspaceless %}""")
+        c = Context({})
         result = t.render(c)
         self.assertEqual(result, "Hello, humans")
