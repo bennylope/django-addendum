@@ -3,8 +3,6 @@ import warnings
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 
 
 def get_cached_snippet(key):
@@ -114,6 +112,21 @@ class Snippet(models.Model):
     def __str__(self):
         return self.key
 
+    def save(self, *args, **kwargs):
+        super(Snippet, self).save(*args, **kwargs)
+        self.set_cache()
+        return self
+
+    def delete(self, **kwargs):
+        cache.delete('snippet:{0}'.format(self.key))
+        return super(Snippet, self).delete(**kwargs)
+
+    def set_cache(self):
+        """
+        Updates the cached value of the instance
+        """
+        cache.set('snippet:{0}'.format(self.key), self.text)
+
 
 class SnippetTranslation(models.Model):
     """
@@ -130,35 +143,17 @@ class SnippetTranslation(models.Model):
     def __str__(self):
         return "{0} ({1})".format(self.snippet, self.language)
 
+    def save(self, *args, **kwargs):
+        super(SnippetTranslation, self).save(*args, **kwargs)
+        self.set_cache()
+        return self
 
-@receiver(post_save, sender=Snippet)
-def set_cached_snippet(sender, **kwargs):
-    """Update the cached copy of the snippet on creation or change"""
-    instance = kwargs.pop('instance')
-    cache.set('snippet:{0}'.format(instance.key), instance.text)
+    def delete(self, **kwargs):
+        cache.delete('snippet:{0}:{1}'.format(self.language, self.snippet))
+        return super(Snippet, self).delete(**kwargs)
 
-
-@receiver(post_delete, sender=Snippet)
-def clear_cached_snippet(sender, **kwargs):
-    """Remove the cached copy of the snippet after deletion"""
-    instance = kwargs.pop('instance')
-    cache.delete('snippet:{0}'.format(instance.key))
-
-
-@receiver(post_save, sender=SnippetTranslation)
-def set_cached_translation(sender, **kwargs):
-    """
-    Update the cached copy of the snippet translation on creation or
-    change
-    """
-    instance = kwargs.pop('instance')
-    cache.set('snippet:{0}:{1}'.format(instance.language, instance.snippet), instance.text)
-
-
-@receiver(post_delete, sender=SnippetTranslation)
-def clear_cached_translation(sender, **kwargs):
-    """
-    Remove the cached copy of the snippet translation after deletion
-    """
-    instance = kwargs.pop('instance')
-    cache.delete('snippet:{0}:{1}'.format(instance.language, instance.snippet))
+    def set_cache(self):
+        """
+        Updates the cached value of the instance
+        """
+        cache.set('snippet:{0}:{1}'.format(self.language, self.snippet), self.text)
