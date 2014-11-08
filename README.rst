@@ -70,6 +70,9 @@ Add it to your `INSTALLED_APPS` tuple::
 
 Sync your database or migrate if you have `South <south.readthedocs.org/en/latest/>`_ installed.
 
+.. note::
+    Django Addendum is not compatible with South versions prior to 1.0.
+
 Contributing
 ============
 
