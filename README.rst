@@ -2,9 +2,9 @@
 Django Addendum
 ===============
 
-.. image:: https://api.travis-ci.org/wellfire/django-addendum.png?branch=master
+.. image:: https://api.travis-ci.org/bennylope/django-addendum.png?branch=master
     :alt: Build Status
-    :target: http://travis-ci.org/wellfire/django-addendum
+    :target: http://travis-ci.org/bennylope/django-addendum
 
 .. image:: https://pypip.in/v/django-addendum/badge.png
     :alt: Current PyPI release
