@@ -49,8 +49,8 @@ project.::
     python manage.py refresh_snippet_cache
 
 Older versions of Django Addendum stored the entire snippet object in the
-cache; from 0.3.0 onwards only the text value of the snippet is stored in the
-cache value.
+cache; from 0.3.0 onwards a dictionary of snippet values (including
+translations) are stored against the snippet cache key.
 
 Basic Usage
 ===========
@@ -104,24 +104,83 @@ Translations
 
 Django Addendum version 0.3.0 introduced multilingual support.
 
-Past experience and a fresh review of the available model translation tools
-suggested that marrying one reusable app with another for dynamically building
-database fields was not going to work well. Providing this functionality is
-simple enough.
-
-.. note::
-    If you do not have internationalization enabled in your Django project you
-    will not notice any changes.
+Setup
+-----
 
 If you plan on using snippet translations, presumably you already have
 internationalization enabled in your project.::
 
     USE_I18N = True
 
-The translations will exist as text models linked to the main snippet.
+.. note::
+    If you do not have internationalization enabled in your Django project you
+    will not notice any changes.
+
+Models
+------
+
+A new `SnippetTranslation` model will add a table to your database whether you
+use internationalization support or not.
+
+If you do not have `i18n` enabled in your project, you won't notice any other
+changes other than this new table. If you do have `i18n` support enabled, each
+Snippet will have inline SnippetTranslation instances availabe in the admin.
+
+.. image:: snippet-inlines.png
 
 The available language options are provided by your `LANGUAGES` settings tuple.
 
+Cache
+-----
+
+Translations are stored with the original snippet in the cache store for the
+given key.::
+
+    {
+      "": "Original snippet",
+      "es": "Fragmento original",
+    }
+
+The interface for updating and retrieving these values is provided by the
+`set_cached_snippet` and `get_cached_snippet` functions.
+
+The `set_cached_snippet` function takes a snippet key and updates the complete
+cached dictionary from the snippet and its translations. The
+`get_cached_snippet` function takes a key and optional language code and
+returns the text for the snippet by translation, if available, otherwise it
+returns the default snippet (or `None` if none is found).
+
+Templates
+---------
+
+Provided you are using the `i18n` context processor and a RequestContext, then
+the language will be accessible from the context without any changes.::
+
+    {% load addendum_tags %}
+    {% snippet 'greeting' %}Welcome!{% endsnippet %}
+
+If you've added a translation for Spanish and your users are accessing your
+content with 'es' in their requests:
+
+    Bienvenidos
+
+You can also specify the language via a variable of your choosing::
+
+    {% load addendum_tags %}
+    {% snippet 'greeting' language=language_template_var %}Bienvenidos!{% endsnippet %}
+
+Or a string::
+
+    {% load addendum_tags %}
+    {% snippet 'greeting' language='es-mx' %}Bienvenidos!{% endsnippet %}
+
+The specified language string will probably be less helpful for most use cases.
+
+.. note::
+    The language code checks are strict. If you want to support alternate
+    dialects, e.g. American, Australian, British English, then you will need to
+    provide translations for each. The lookup will not fall back on the parent
+    language.
 
 Caching
 =======

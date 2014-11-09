@@ -1,6 +1,13 @@
 Changes
 =======
 
+0.3.0
+-----
+
+* Adds multilingual (i18n) support
+* Adds management command for updating cache
+* Removes support for Python 2.6 and Django 1.5
+
 0.2.0
 -----
 

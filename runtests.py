@@ -7,6 +7,7 @@ try:
     settings.configure(
         DEBUG=True,
         USE_TZ=True,
+        USE_I18N=True,
         DATABASES={
             "default": {
                 "ENGINE": "django.db.backends.sqlite3",
@@ -22,7 +23,8 @@ try:
         MIDDLEWARE_CLASSES=(),
         SITE_ID=1,
         NOSE_ARGS=['-s'],
-        FIXTURE_DIRS=['tests/fixtures']
+        FIXTURE_DIRS=['tests/fixtures'],
+        LANGUAGE_CODE='es',
     )
     if hasattr(django, 'setup'):
         django.setup()

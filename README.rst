@@ -73,6 +73,8 @@ Sync your database or migrate if you have `South <south.readthedocs.org/en/lates
 .. note::
     Django Addendum is not compatible with South versions prior to 1.0.
 
+See the docs for upgrade notes.
+
 Contributing
 ============
 

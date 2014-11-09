@@ -1,3 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 import warnings
 
 from django.conf import settings
@@ -5,7 +10,28 @@ from django.core.cache import cache
 from django.db import models
 
 
-def get_cached_snippet(key):
+def set_cached_snippet(key):
+    """
+    Adds a dictionary of snippet text and translations to the cache.
+
+    The default text has the key of an empty string.
+
+        {
+            "": "Hello, humans",
+            "es": "Hola, humanos",
+            "en-au": "G'day, humans",
+        }
+
+    """
+    text_dict = {
+        trans.language: trans.text for trans in
+        SnippetTranslation.objects.filter(snippet_id=key)
+    }
+    text_dict.update({'': Snippet.objects.get(key=key).text})
+    cache.set('snippet:{0}'.format(key), text_dict)
+
+
+def get_cached_snippet(key, language=''):
     """
     Fetches the snippet from cache.
 
@@ -16,66 +42,40 @@ def get_cached_snippet(key):
     default return value for a cache miss, the method uses -1 as the miss
     value. If this is returned we know that the value should not be present
     in the database, either.
-    """
-    text = cache.get('snippet:{0}'.format(key))
 
-    if text == -1:
+    :param key: the snippet key (string)
+    :param language: optional language code (string)
+    :returns: text of snippet (string) or None
+    """
+    # TODO on fallback try looking for parent language string, e.g. if 'es-ar'
+    # is missing then try looking for 'es'.
+
+    snippet = cache.get('snippet:{0}'.format(key))
+
+    # Previous cache miss and DB miss
+    if snippet == -1:
         return None
 
-    if text is None:
+    # First cache miss
+    if snippet is None:
         try:
-            text = Snippet.objects.get(key=key).text
+            snippet = Snippet.objects.get(key=key)
         except Snippet.DoesNotExist:
             cache.set('snippet:{0}'.format(key), -1)
+            snippet = {'': None}
         else:
-            cache.set('snippet:{0}'.format(key), text)
+            set_cached_snippet(key)
 
-    return text
-
-
-def get_cached_translation(key, language):
-    """
-    Returns a snippet by given language, defaulting to the base snippet if
-    unavailable.
-    """
-    text = cache.get('snippet:{0}:{1}'.format(language, key))
-
-    if text == -1:
-        return None
-
-    if text is None:
-        try:
-            text = SnippetTranslation.objects.get(snippet_id=key, language=language).text
-        except SnippetTranslation.DoesNotExist:
-            cache.set('snippet:{0}:{1}'.format(language, key), -1)
-            text = get_cached_snippet(key)
-
-    return text
-
-
-def get_cached_text(key, language=None):
-    """
-    Interface function for getting the text of a snippet by key and/or by
-    language.
-    """
-    if language is not None:
-        return get_cached_translation(key, language)
-    return get_cached_snippet(key)
+    return snippet.get(language, snippet.get(''))
 
 
 class CachedManager(models.Manager):
 
     def get_from_cache(self, key):
         """
-        Fetches the snippet from cache.
+        DEPRECATED.
 
-        Returns a `Snippet` object or `None`.
-
-        This method addes every queried key to the cache to ensure that misses
-        doesn't continue to generate database lookups. Since `None` is the
-        default return value for a cache miss, the method uses -1 as the miss
-        value. If this is returned we know that the value should not be present
-        in the database, either.
+        Use get_cached_snippet instead.
         """
         warnings.warn("The CachedManager is now deprecated, use get_cached_text instead",
                 DeprecationWarning)
@@ -114,18 +114,12 @@ class Snippet(models.Model):
 
     def save(self, *args, **kwargs):
         super(Snippet, self).save(*args, **kwargs)
-        self.set_cache()
+        set_cached_snippet(self.key)
         return self
 
     def delete(self, **kwargs):
         cache.delete('snippet:{0}'.format(self.key))
         return super(Snippet, self).delete(**kwargs)
-
-    def set_cache(self):
-        """
-        Updates the cached value of the instance
-        """
-        cache.set('snippet:{0}'.format(self.key), self.text)
 
 
 class SnippetTranslation(models.Model):
@@ -145,15 +139,12 @@ class SnippetTranslation(models.Model):
 
     def save(self, *args, **kwargs):
         super(SnippetTranslation, self).save(*args, **kwargs)
-        self.set_cache()
+        set_cached_snippet(self.snippet_id)
         return self
 
     def delete(self, **kwargs):
-        cache.delete('snippet:{0}:{1}'.format(self.language, self.snippet))
+        """
+        After removing from the database update the snippet cache values.
+        """
         return super(Snippet, self).delete(**kwargs)
-
-    def set_cache(self):
-        """
-        Updates the cached value of the instance
-        """
-        cache.set('snippet:{0}:{1}'.format(self.language, self.snippet), self.text)
+        set_cached_snippet(self.snippet_id)

@@ -3,7 +3,7 @@ from django.template.base import TemplateSyntaxError
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from ..models import get_cached_text
+from ..models import get_cached_snippet
 
 
 register = template.Library()
@@ -37,10 +37,7 @@ def build_options(bits, tag_name):
         if option == 'richtext':
             option = 'safe'
 
-        if option == 'language':
-            options.update({option: val})
-        else:
-            options.update({option: str_bool(val)})
+        options.update({option: val})
 
     return options
 
@@ -76,13 +73,13 @@ class SnippetNode(template.Node):
 
     safe = False
     template = False
-    language = None
+    language = ''
 
     def __init__(self, nodelist, key, **options):
         self.nodelist = nodelist
         self.key = template.Variable(key)
         for k, v in options.items():
-            setattr(self, k, v)
+            setattr(self, k, template.Variable(v))
 
     def render(self, context):
 
@@ -92,15 +89,15 @@ class SnippetNode(template.Node):
         except AttributeError:
             key = self.key[1:-1]
 
-        if self.language is not None:
+        if self.language != '':
             try:
                 language = self.language.resolve(context)
             except AttributeError:
                 language = self.language[1:-1]
         else:
-            language = self.language
+            language = context.get('LANGUAGE_CODE', self.language)
 
-        snippet = get_cached_text(key, language)
+        snippet = get_cached_snippet(key, language)
 
         if snippet is None:
             output = self.nodelist.render(context)
