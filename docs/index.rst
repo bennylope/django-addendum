@@ -38,6 +38,20 @@ Sync your database or migrate if you have `South
 .. note::
     Django Addendum is not compatible with South versions prior to 1.0.
 
+Upgrading
+---------
+
+If you are upgrading from a version prior to 0.3.0 you will need to flush your
+cache, as the cached values have change. You can reload your cache layer or
+simply run the refresh management command immediately after updating your
+project.::
+
+    python manage.py refresh_snippet_cache
+
+Older versions of Django Addendum stored the entire snippet object in the
+cache; from 0.3.0 onwards only the text value of the snippet is stored in the
+cache value.
+
 Basic Usage
 ===========
 
@@ -85,6 +99,30 @@ away by adding differently formatted content.
     Previous versions used the `richtext` keyword. This will work as well, but
     is deprecated.
 
+Translations
+============
+
+Django Addendum version 0.3.0 introduced multilingual support.
+
+Past experience and a fresh review of the available model translation tools
+suggested that marrying one reusable app with another for dynamically building
+database fields was not going to work well. Providing this functionality is
+simple enough.
+
+.. note::
+    If you do not have internationalization enabled in your Django project you
+    will not notice any changes.
+
+If you plan on using snippet translations, presumably you already have
+internationalization enabled in your project.::
+
+    USE_I18N = True
+
+The translations will exist as text models linked to the main snippet.
+
+The available language options are provided by your `LANGUAGES` settings tuple.
+
+
 Caching
 =======
 
@@ -98,8 +136,11 @@ obvious and non `NoneType` value is stored to prevent subsequent database
 lookups. Cache return values of `-1` are treated immediately as absent keys and
 the base text in the template is rendered directly.
 
-Signal recievers for both the `post_save` and `post_delete` signals ensure that
-keys are properly updated.
+Management commands
+===================
+
+The `refresh_snippet_cache` command will cycle through all snippets and update
+the cached value.
 
 License
 =======
