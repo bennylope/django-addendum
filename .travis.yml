@@ -2,7 +2,6 @@ language: python
 python: 2.7
 env:
   - TOX_ENV=flake8
-  - TOX_ENV=py26-django14
   - TOX_ENV=py27-django14
   - TOX_ENV=py27-django15
   - TOX_ENV=py27-django16
