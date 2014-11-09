@@ -2,15 +2,15 @@
 Django Addendum
 ===============
 
-.. image:: https://api.travis-ci.org/bennylope/django-addendum.png?branch=master
+.. image:: https://api.travis-ci.org/bennylope/django-addendum.svg?branch=master
     :alt: Build Status
     :target: http://travis-ci.org/bennylope/django-addendum
 
-.. image:: https://pypip.in/v/django-addendum/badge.png
+.. image:: https://pypip.in/v/django-addendum/badge.svg
     :alt: Current PyPI release
     :target: https://crate.io/packages/django-addendum
 
-.. image:: https://pypip.in/d/django-addendum/badge.png
+.. image:: https://pypip.in/d/django-addendum/badge.svg
     :alt: Download count
     :target: https://crate.io/packages/django-addendum
 
