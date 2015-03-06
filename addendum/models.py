@@ -65,6 +65,7 @@ def get_cached_snippet(key, language=''):
             snippet = {'': None}
         else:
             set_cached_snippet(key)
+            snippet = cache.get('snippet:{0}'.format(key))
 
     return snippet.get(language, snippet.get(''))
 
