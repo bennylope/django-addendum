@@ -23,7 +23,7 @@ Solving queries like:
 
 And:
 
-    The footer copy needs to be udpated.
+    The footer copy needs to be updated.
 
 And:
 
