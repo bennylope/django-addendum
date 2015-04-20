@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.3.3
+-----
+
+* Fix project homepage URL
+
 0.3.2
 -----
 
