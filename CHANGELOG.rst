@@ -1,6 +1,17 @@
 Changes
 =======
 
+0.3.2
+-----
+
+* Bug fix in cache value return
+* Adds Django 1.8 testing
+
+0.3.1
+-----
+
+* Formatting fixes
+
 0.3.0
 -----
 
