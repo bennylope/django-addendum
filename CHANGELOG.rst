@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.3.4
+-----
+
+* Address bad data included in Wheel package
+
 0.3.3
 -----
 
