@@ -89,3 +89,19 @@ License
 =======
 
 BSD licensed.
+
+Testing
+=======
+
+To run the tests, clone the repository and install tox.::
+
+    pip install tox
+
+Then use the command::
+
+    tox
+
+To run the tests against specified (or all) environments.
+
+Otherwise, install the test requirements in `requirements.txt` and then run the
+`py.test` comand. `tox` is recommended.

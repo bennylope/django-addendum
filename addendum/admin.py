@@ -1,11 +1,13 @@
 from django.contrib import admin
 from django.conf import settings
 
+from .forms import TranslationForm
 from .models import Snippet, SnippetTranslation
 
 
 class TranslationAdmin(admin.TabularInline):
     model = SnippetTranslation
+    form = TranslationForm
     extra = 1
 
 
