@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.conf import settings
 from django.core.cache import cache
 from django.db import models
 
@@ -129,7 +128,7 @@ class SnippetTranslation(models.Model):
     language.
     """
     snippet = models.ForeignKey(Snippet, related_name="translations")
-    language = models.CharField(max_length=5, choices=settings.LANGUAGES)
+    language = models.CharField(max_length=5)
     text = models.TextField()
 
     class Meta:
