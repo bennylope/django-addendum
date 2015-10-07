@@ -1,6 +1,16 @@
 Changes
 =======
 
+0.3.5
+-----
+
+* Fixes migration issue (possibly breaking for some users): the field choices
+  as provided in the SnippetTranslation model populated a new migration when
+  installed in a project, and these noticeably changed after an update to the
+  project's testing framework. This was 'fixed' by removing the choices from
+  the model to a ModelForm class, but users with 0.3.4 installed might have an
+  extra migration. Only affects Django 1.8+.
+
 0.3.4
 -----
 
