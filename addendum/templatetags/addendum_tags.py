@@ -9,14 +9,6 @@ from ..models import get_cached_snippet
 register = template.Library()
 
 
-def str_bool(val):
-    if val.lower() == "true":
-        return True
-    elif val.lower() == "false":
-        return False
-    raise ValueError("{0} is not a string representation of a boolean".format(val))
-
-
 def build_options(bits, tag_name):
     """
     Splits the tag keyword arguments into usable values.
@@ -30,12 +22,12 @@ def build_options(bits, tag_name):
         except ValueError:
             raise TemplateSyntaxError("%s has bad or badly formed option arguments." % tag_name)
 
-        if option not in ['safe', 'richtext', 'template', 'language']:
-            raise TemplateSyntaxError("%s recieved an invalid option." % tag_name)
-
         # Backwards compatibility
         if option == 'richtext':
             option = 'safe'
+
+        if option not in ['safe', 'template', 'language']:
+            raise TemplateSyntaxError("%s received an invalid option." % tag_name)
 
         options.update({option: val})
 
@@ -57,23 +49,23 @@ def snippet(parser, token):
     nodelist = parser.parse(('endsnippet',))
     parser.delete_first_token()
 
+    bits = token.split_contents()
+    tag_name = bits[0]
     try:
-        tag_name = token.split_contents()
-        bits = token.split_contents()[1:]
+        key = bits[1]
     except IndexError:
-        raise TemplateSyntaxError("%s tag takes at least one argument" % bits[0])
+        raise TemplateSyntaxError("%s tag takes at least one argument" % tag_name)
 
-    key = bits[0]
-    options = build_options(bits[1:], tag_name)
+    options = build_options(bits[2:], tag_name)
 
     return SnippetNode(nodelist, key, **options)
 
 
 class SnippetNode(template.Node):
 
-    safe = False
-    template = False
-    language = ''
+    safe = None
+    template = None
+    language = None
 
     def __init__(self, nodelist, key, **options):
         self.nodelist = nodelist
@@ -82,20 +74,12 @@ class SnippetNode(template.Node):
             setattr(self, k, template.Variable(v))
 
     def render(self, context):
+        key = self.key.resolve(context)
 
-        # Handle key as context variable or key as string
-        try:
-            key = self.key.resolve(context)
-        except AttributeError:
-            key = self.key[1:-1]
-
-        if self.language != '':
-            try:
-                language = self.language.resolve(context)
-            except AttributeError:
-                language = self.language[1:-1]
+        if self.language:
+            language = self.language.resolve(context)
         else:
-            language = context.get('LANGUAGE_CODE', self.language)
+            language = context.get('LANGUAGE_CODE', '')
 
         snippet = get_cached_snippet(key, language)
 
@@ -104,10 +88,17 @@ class SnippetNode(template.Node):
             return output
 
         if self.template:
+            self.template = self.template.resolve(context)
+
+        if self.safe:
+            self.safe = self.safe.resolve(context)
+
+        if self.template:
+            rendered = template.Template(snippet).render(context)
             if self.safe:
                 context.autoescape = False
-                return mark_safe(template.Template(snippet).render(context))
-            return template.Template(snippet).render(context)
+                return mark_safe(rendered)
+            return rendered
 
         if self.safe:
             return mark_safe(snippet)
