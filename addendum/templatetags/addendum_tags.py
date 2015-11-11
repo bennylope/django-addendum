@@ -52,7 +52,7 @@ def snippet(parser, token):
 
         {% snippet 'greeting' %}Hello world{% endsnippet %}
 
-        {% snippet 'greeting' richtext=True %}<p>Hey!</p>{% endsnippet %}
+        {% snippet 'greeting' safe=True %}<p>Hey!</p>{% endsnippet %}
     """
     nodelist = parser.parse(('endsnippet',))
     parser.delete_first_token()
