@@ -60,6 +60,20 @@ class TagTests(TestCase):
         result = t.render(c)
         self.assertEqual(result, "<h1>Hello, humans</h1>")
 
+    def test_safe(self):
+        """Ensure that with safe argument content is escaped"""
+        t = Template("""{% load addendum_tags %}{% snippet 'rich' safe=True %}Hello world{% endsnippet %}""")
+        c = Context({})
+        result = t.render(c)
+        self.assertEqual(result, "<h1>Hello, humans</h1>")
+
+    def test_safe_false(self):
+        """Ensure that with safe argument which is False content is not escaped"""
+        t = Template("""{% load addendum_tags %}{% snippet 'rich' safe=isallowed %}Hello world{% endsnippet %}""")
+        c = Context({'isallowed': False})
+        result = t.render(c)
+        self.assertEqual(result, "&lt;h1&gt;Hello, humans&lt;/h1&gt;")
+
     def test_raw_template_text(self):
         """Ensure template code is not compiled by default"""
         t = Template("""{% load addendum_tags %}{% snippet 'django' %}Hello world{% endsnippet %}""")
@@ -80,10 +94,10 @@ class TagTests(TestCase):
         result = t.render(c)
         self.assertEqual(result, "&lt;H1&gt;WOOF&lt;/H1&gt;")
 
-        t = Template("""{% load addendum_tags %}{% snippet 'django' template=True safe=True %}Hello world{% endsnippet %}""")
-        c = Context({'dog': '<h1>woof</h1>'})
+        t = Template("""{% load addendum_tags %}{% snippet 'django' template=True safe=True %}Hello world{% endsnippet %} {{ after }}""")
+        c = Context({'dog': '<h1>woof</h1>', 'after': '<h1>no longer safe</h1>'})
         result = t.render(c)
-        self.assertEqual(result, "<H1>WOOF</H1>")
+        self.assertEqual(result, "<H1>WOOF</H1> &lt;h1&gt;no longer safe&lt;/h1&gt;")
 
     def test_variable_key_name(self):
         """Ensure a variable can be passed for the snippet key"""

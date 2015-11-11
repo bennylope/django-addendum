@@ -94,11 +94,13 @@ class SnippetNode(template.Node):
             self.safe = self.safe.resolve(context)
 
         if self.template:
-            rendered = template.Template(snippet).render(context)
             if self.safe:
+                old_autoescape = context.autoescape
                 context.autoescape = False
+                rendered = template.Template(snippet).render(context)
+                context.autoescape = old_autoescape
                 return mark_safe(rendered)
-            return rendered
+            return template.Template(snippet).render(context)
 
         if self.safe:
             return mark_safe(snippet)
