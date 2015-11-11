@@ -75,7 +75,7 @@ You can use template variables for snippet names, too.
 
 
 Now you can edit content for these placeholders from the admin interface. If
-you don't add anything or you delete text, the site text will always revert to
+you delete a snippet, the site text will always revert to
 what is in the template.
 
 Use it for small bits of user modifiable text from any template on your site,
