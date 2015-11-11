@@ -8,7 +8,7 @@ from .models import Snippet, SnippetTranslation
 class TranslationAdmin(admin.TabularInline):
     model = SnippetTranslation
     form = TranslationForm
-    extra = 1
+    extra = 0
 
 
 class SnippetAdmin(admin.ModelAdmin):
