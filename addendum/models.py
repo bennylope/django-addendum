@@ -119,6 +119,7 @@ class Snippet(models.Model):
         set_cached_snippet(self.key)
         return self
 
+
 @receiver(post_delete, sender=Snippet)
 def delete_snippet(instance, **kwargs):
     cache.delete('snippet:{0}'.format(instance.key))
@@ -143,6 +144,7 @@ class SnippetTranslation(models.Model):
         super(SnippetTranslation, self).save(*args, **kwargs)
         set_cached_snippet(self.snippet_id)
         return self
+
 
 @receiver(post_delete, sender=SnippetTranslation)
 def delete_snippet_translation(instance, **kwargs):
