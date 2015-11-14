@@ -7,6 +7,8 @@ import warnings
 
 from django.core.cache import cache
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 
 def set_cached_snippet(key):
@@ -117,9 +119,10 @@ class Snippet(models.Model):
         set_cached_snippet(self.key)
         return self
 
-    def delete(self, **kwargs):
-        cache.delete('snippet:{0}'.format(self.key))
-        return super(Snippet, self).delete(**kwargs)
+
+@receiver(post_delete, sender=Snippet)
+def delete_snippet(instance, **kwargs):
+    cache.delete('snippet:{0}'.format(instance.key))
 
 
 class SnippetTranslation(models.Model):
@@ -142,9 +145,10 @@ class SnippetTranslation(models.Model):
         set_cached_snippet(self.snippet_id)
         return self
 
-    def delete(self, **kwargs):
-        """
-        After removing from the database update the snippet cache values.
-        """
-        return super(Snippet, self).delete(**kwargs)
-        set_cached_snippet(self.snippet_id)
+
+@receiver(post_delete, sender=SnippetTranslation)
+def delete_snippet_translation(instance, **kwargs):
+    """
+    After removing from the database update the snippet cache values.
+    """
+    set_cached_snippet(instance.snippet_id)
