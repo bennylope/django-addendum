@@ -3,7 +3,7 @@ from django.template.base import TemplateSyntaxError
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from ..models import get_cached_snippet
+from ..models import get_cached_snippet, Snippet
 
 
 register = template.Library()
@@ -85,6 +85,8 @@ class SnippetNode(template.Node):
 
         if snippet is None:
             output = self.nodelist.render(context)
+            snippet = Snippet(key=key, text=output)
+            snippet.save()
             return output
 
         if self.template:
