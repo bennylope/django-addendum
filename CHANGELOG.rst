@@ -1,6 +1,14 @@
 Changes
 =======
 
+0.4.0
+-----
+
+* Drop support for Django 1.4
+* Packaging fix
+* Automatically create missing Snippet instances
+* Bug fixes for cache invalidation, admin langauges, text autoescaping
+
 0.3.5
 -----
 
