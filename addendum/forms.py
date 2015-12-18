@@ -8,7 +8,7 @@ from .models import SnippetTranslation
 
 class TranslationForm(forms.ModelForm):
 
-    language = forms.ChoiceField(choices=settings.LANGUAGES)
+    language = forms.ChoiceField(choices=settings.LANGUAGES, initial='en')
 
     class Meta:
         model = SnippetTranslation
