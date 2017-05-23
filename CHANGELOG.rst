@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.5.1
+-----
+
+* Fix a packaging error
+
 0.5.0
 -----
 
