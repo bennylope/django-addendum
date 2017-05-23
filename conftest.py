@@ -29,6 +29,20 @@ def pytest_configure():
         SITE_ID=1,
         FIXTURE_DIRS=['tests/fixtures'],
         LANGUAGE_CODE='es',
+        TEMPLATES=[
+            {
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'APP_DIRS': True,
+                'OPTIONS': {
+                    'context_processors': [
+                        'django.template.context_processors.debug',
+                        'django.template.context_processors.request',
+                        'django.contrib.auth.context_processors.auth',
+                        'django.template.context_processors.i18n',
+                    ]
+                }
+            },
+        ],
     )
     try:
         django.setup()
