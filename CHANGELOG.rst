@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.5.2
+-----
+
+* Fix issue in which variables may be explicitly boolean in render method
+
 0.5.1
 -----
 

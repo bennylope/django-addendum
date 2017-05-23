@@ -121,10 +121,16 @@ class SnippetNode(template.Node):
             return default_text
 
         if self.template:
-            self.template = self.template.resolve(context)
+            try:
+                self.template = self.template.resolve(context)
+            except AttributeError:
+                self.template = True
 
         if self.safe:
-            self.safe = self.safe.resolve(context)
+            try:
+                self.safe = self.safe.resolve(context)
+            except AttributeError:
+                self.safe = True
 
         if self.template:
             return self.render_as_template(context, snippet, default_text)
