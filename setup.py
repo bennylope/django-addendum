@@ -26,7 +26,7 @@ setup(
     author_email='ben.lopatin@wellfireinteractive.com',
     url='https://github.com/bennylope/django-addendum',
     license='BSD License',
-    packages=['addendum'],
+    packages=find_packages(exclude=['tests']),
     platforms=['OS Independent'],
     classifiers=[
         'Development Status :: 4 - Beta',
