@@ -1,6 +1,14 @@
 Changes
 =======
 
+0.5.0
+-----
+
+* Removes South support!
+* Django 1.8 and 1.11 support only for now
+* MAJOR: updates behavior for templated snippets to prevent template errors
+  from bubbling up.
+
 0.4.0
 -----
 
