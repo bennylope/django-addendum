@@ -99,6 +99,14 @@ class TagTests(TestCase):
         result = t.render(c)
         self.assertEqual(result, "<H1>WOOF</H1> &lt;h1&gt;no longer safe&lt;/h1&gt;")
 
+    def test_template_error(self):
+        """Ensure templated snippets do not crash a page render"""
+        bad_snippet = Snippet.objects.create(key="bad", text="{% for i in x %}")
+        t = Template("""{% load addendum_tags %}{% snippet 'bad' template=True %}Hello world{% endsnippet %}""")
+        c = Context({'dog': 'woof'})
+        result = t.render(c)
+        self.assertEqual(result, "Hello world")
+
     def test_variable_key_name(self):
         """Ensure a variable can be passed for the snippet key"""
         t = Template("""{% load addendum_tags %}{% snippet snippetname %}Hello world{% endsnippet %}""")

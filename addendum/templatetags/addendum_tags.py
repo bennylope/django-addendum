@@ -1,11 +1,13 @@
+import logging
+
 from django import template
 from django.template.base import TemplateSyntaxError
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from ..models import get_cached_snippet, Snippet
+from addendum.models import get_cached_snippet, Snippet
 
-
+logger = logging.getLogger(__name__)
 register = template.Library()
 
 
@@ -73,6 +75,35 @@ class SnippetNode(template.Node):
         for k, v in options.items():
             setattr(self, k, template.Variable(v))
 
+    def get_snippet_defaults(self, context, key, language):
+        snippet = get_cached_snippet(key, language)
+        default_text = self.nodelist.render(context)
+
+        if snippet is None:
+            snippet = Snippet(key=key, text=default_text)
+            snippet.save()
+            return default_text
+
+        return snippet, default_text
+
+    def render_as_template(self, context, snippet, default_text):
+        if self.safe:
+            old_autoescape = context.autoescape
+            context.autoescape = False
+            try:
+                rendered = template.Template(snippet).render(context)
+            except TemplateSyntaxError:
+                logger.exception("Template error in snippet")
+                return default_text
+            context.autoescape = old_autoescape
+            return mark_safe(rendered)
+
+        try:
+            return template.Template(snippet).render(context)
+        except TemplateSyntaxError:
+            logger.exception("Template error in snippet")
+            return default_text
+
     def render(self, context):
         key = self.key.resolve(context)
 
@@ -82,12 +113,12 @@ class SnippetNode(template.Node):
             language = context.get('LANGUAGE_CODE', '')
 
         snippet = get_cached_snippet(key, language)
+        default_text = self.nodelist.render(context)
 
         if snippet is None:
-            output = self.nodelist.render(context)
-            snippet = Snippet(key=key, text=output)
+            snippet = Snippet(key=key, text=default_text)
             snippet.save()
-            return output
+            return default_text
 
         if self.template:
             self.template = self.template.resolve(context)
@@ -96,14 +127,7 @@ class SnippetNode(template.Node):
             self.safe = self.safe.resolve(context)
 
         if self.template:
-            if self.safe:
-                old_autoescape = context.autoescape
-                context.autoescape = False
-                rendered = template.Template(snippet).render(context)
-                context.autoescape = old_autoescape
-                return mark_safe(rendered)
-            return template.Template(snippet).render(context)
-
+            return self.render_as_template(context, snippet, default_text)
         if self.safe:
             return mark_safe(snippet)
 
