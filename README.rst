@@ -66,12 +66,6 @@ Add it to your `INSTALLED_APPS` tuple::
 
     INSTALLED_APPS += ('addendum')
 
-Sync your database or migrate if you have `South <south.readthedocs.org/en/latest/>`_ installed.
-
-.. note::
-    Django Addendum is not compatible with South versions prior to 1.0.
-
-See the docs for upgrade notes.
 
 Contributing
 ============
