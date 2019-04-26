@@ -20,15 +20,17 @@ def build_options(bits, tag_name):
 
     for bit in bits:
         try:
-            option, val = bit.split('=')
+            option, val = bit.split("=")
         except ValueError:
-            raise TemplateSyntaxError("%s has bad or badly formed option arguments." % tag_name)
+            raise TemplateSyntaxError(
+                "%s has bad or badly formed option arguments." % tag_name
+            )
 
         # Backwards compatibility
-        if option == 'richtext':
-            option = 'safe'
+        if option == "richtext":
+            option = "safe"
 
-        if option not in ['safe', 'template', 'language']:
+        if option not in ["safe", "template", "language"]:
             raise TemplateSyntaxError("%s received an invalid option." % tag_name)
 
         options.update({option: val})
@@ -48,7 +50,7 @@ def snippet(parser, token):
 
         {% snippet 'greeting' safe=True %}<p>Hey!</p>{% endsnippet %}
     """
-    nodelist = parser.parse(('endsnippet',))
+    nodelist = parser.parse(("endsnippet",))
     parser.delete_first_token()
 
     bits = token.split_contents()
@@ -110,7 +112,7 @@ class SnippetNode(template.Node):
         if self.language:
             language = self.language.resolve(context)
         else:
-            language = context.get('LANGUAGE_CODE', '')
+            language = context.get("LANGUAGE_CODE", "")
 
         snippet = get_cached_snippet(key, language)
         default_text = self.nodelist.render(context)

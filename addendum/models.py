@@ -25,14 +25,14 @@ def set_cached_snippet(key):
 
     """
     text_dict = {
-        trans.language: trans.text for trans in
-        SnippetTranslation.objects.filter(snippet_id=key)
+        trans.language: trans.text
+        for trans in SnippetTranslation.objects.filter(snippet_id=key)
     }
-    text_dict.update({'': Snippet.objects.get(key=key).text})
-    cache.set('snippet:{0}'.format(key), text_dict)
+    text_dict.update({"": Snippet.objects.get(key=key).text})
+    cache.set("snippet:{0}".format(key), text_dict)
 
 
-def get_cached_snippet(key, language=''):
+def get_cached_snippet(key, language=""):
     """
     Fetches the snippet from cache.
 
@@ -51,7 +51,7 @@ def get_cached_snippet(key, language=''):
     # TODO on fallback try looking for parent language string, e.g. if 'es-ar'
     # is missing then try looking for 'es'.
 
-    snippet = cache.get('snippet:{0}'.format(key))
+    snippet = cache.get("snippet:{0}".format(key))
 
     # Previous cache miss and DB miss
     if snippet == -1:
@@ -62,26 +62,27 @@ def get_cached_snippet(key, language=''):
         try:
             snippet = Snippet.objects.get(key=key)
         except Snippet.DoesNotExist:
-            cache.set('snippet:{0}'.format(key), -1)
-            snippet = {'': None}
+            cache.set("snippet:{0}".format(key), -1)
+            snippet = {"": None}
         else:
             set_cached_snippet(key)
-            snippet = cache.get('snippet:{0}'.format(key))
+            snippet = cache.get("snippet:{0}".format(key))
 
-    return snippet.get(language, snippet.get(''))
+    return snippet.get(language, snippet.get(""))
 
 
 class CachedManager(models.Manager):
-
     def get_from_cache(self, key):
         """
         DEPRECATED.
 
         Use get_cached_snippet instead.
         """
-        warnings.warn("The CachedManager is now deprecated, use get_cached_text instead",
-                DeprecationWarning)
-        snippet = cache.get('snippet:{0}'.format(key))
+        warnings.warn(
+            "The CachedManager is now deprecated, use get_cached_text instead",
+            DeprecationWarning,
+        )
+        snippet = cache.get("snippet:{0}".format(key))
 
         if snippet == -1:
             return None
@@ -90,9 +91,9 @@ class CachedManager(models.Manager):
             try:
                 snippet = Snippet.objects.get(key=key)
             except Snippet.DoesNotExist:
-                cache.set('snippet:{0}'.format(key), -1)
+                cache.set("snippet:{0}".format(key), -1)
             else:
-                cache.set('snippet:{0}'.format(key), snippet)
+                cache.set("snippet:{0}".format(key), snippet)
 
         return snippet
 
@@ -104,12 +105,13 @@ class Snippet(models.Model):
     This should be used for the default language in the case of a multilingual
     app.
     """
+
     key = models.CharField(max_length=250, primary_key=True)
     text = models.TextField()
     objects = CachedManager()
 
     class Meta:
-        ordering = ('key',)
+        ordering = ("key",)
 
     def __str__(self):
         return self.key
@@ -122,7 +124,7 @@ class Snippet(models.Model):
 
 @receiver(post_delete, sender=Snippet)
 def delete_snippet(instance, **kwargs):
-    cache.delete('snippet:{0}'.format(instance.key))
+    cache.delete("snippet:{0}".format(instance.key))
 
 
 class SnippetTranslation(models.Model):
@@ -130,12 +132,13 @@ class SnippetTranslation(models.Model):
     Additional text copies of the original snippet for use with the specified
     language.
     """
+
     snippet = models.ForeignKey(Snippet, related_name="translations")
     language = models.CharField(max_length=5)
     text = models.TextField()
 
     class Meta:
-        unique_together = ('snippet', 'language')
+        unique_together = ("snippet", "language")
 
     def __str__(self):
         return "{0} ({1})".format(self.snippet, self.language)

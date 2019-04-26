@@ -16,5 +16,4 @@ class Command(BaseCommand):
         for snippet in Snippet.objects.all():
             set_cached_snippet(snippet.key)
             count += 1
-        self.stdout.write(
-                "Refreshed the cache for {0} snippets.".format(count))
+        self.stdout.write("Refreshed the cache for {0} snippets.".format(count))

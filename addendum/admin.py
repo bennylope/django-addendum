@@ -12,7 +12,7 @@ class TranslationAdmin(admin.TabularInline):
 
 
 class SnippetAdmin(admin.ModelAdmin):
-    list_display = ('key', 'text')
+    list_display = ("key", "text")
     inlines = [TranslationAdmin]
 
     def __init__(self, *args, **kwargs):
