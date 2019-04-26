@@ -1,13 +1,15 @@
+os: linux
+dist: xenial
 language: python
-python: 2.7
-env:
-  - TOX_ENV=flake8
-  - TOX_ENV=py27-django1.8
-  - TOX_ENV=py27-django1.11
-  - TOX_ENV=py36-django1.8
-  - TOX_ENV=py36-django1.11
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "pypy"
+
 install:
-  - pip install tox
+  - pip install tox-travis
 script:
-  - tox -e $TOX_ENV
-sudo: false
+  - tox
