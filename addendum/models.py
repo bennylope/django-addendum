@@ -133,7 +133,9 @@ class SnippetTranslation(models.Model):
     language.
     """
 
-    snippet = models.ForeignKey(Snippet, related_name="translations")
+    snippet = models.ForeignKey(
+        Snippet, related_name="translations", on_delete=models.CASCADE
+    )
     language = models.CharField(max_length=5)
     text = models.TextField()
 

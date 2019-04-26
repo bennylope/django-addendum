@@ -119,7 +119,9 @@ class Migration(migrations.Migration):
                 (
                     "snippet",
                     models.ForeignKey(
-                        related_name="translations", to="addendum.Snippet"
+                        related_name="translations",
+                        to="addendum.Snippet",
+                        on_delete=models.CASCADE,
                     ),
                 ),
             ],
