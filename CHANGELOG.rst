@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.6.0
+-----
+
+* Drop Python 2 and Django 1.11 support
+* Add Django 2, 3 support
+
 0.5.2
 -----
 
